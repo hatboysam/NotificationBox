@@ -1,8 +1,10 @@
 package com.habosa.notificationbox;
 
 import android.app.Notification;
+import android.content.Intent;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class NotificationService extends NotificationListenerService {
@@ -20,6 +22,9 @@ public class NotificationService extends NotificationListenerService {
                 Log.d(TAG, "action:" + action.title);
             }
         }
+
+        Intent intent = NotificationReceiver.getBroadcastIntent(notification);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override

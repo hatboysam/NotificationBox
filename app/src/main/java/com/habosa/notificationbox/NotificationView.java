@@ -14,7 +14,8 @@ public class NotificationView extends CardView {
 
     public NotificationView(Context context, AttributeSet attrs) {
         super(context, attrs);
-//        inflate(context, R.layout.view_notification, this);
+        // TODO: Why was this here?
+        // inflate(context, R.layout.view_notification, this);
     }
 
     public NotificationView(Context context, AttributeSet attrs, int defStyle) {

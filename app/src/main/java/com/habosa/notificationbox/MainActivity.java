@@ -5,16 +5,33 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends AppCompatActivity implements
         View.OnClickListener {
 
+    // TODO: ButterKnife
+
     private static final String TAG = "MainActivity";
+
+    private NotificationReceiver mNotificationReceiver = new NotificationReceiver() {
+        @Override
+        public void onNotification(StatusBarNotification notification) {
+            MainActivity.this.onNotification(notification);
+        }
+    };
+
+    private RecyclerView mRecycler;
+    private NotificationAdapter mAdapter;
+    private LinearLayoutManager mManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +40,35 @@ public class MainActivity extends FragmentActivity implements
 
         findViewById(R.id.button_enable).setOnClickListener(this);
         findViewById(R.id.button_notify).setOnClickListener(this);
+
+        mRecycler = (RecyclerView) findViewById(R.id.notifications_recycler);
+        mAdapter = new NotificationAdapter();
+        mManager = new LinearLayoutManager(this);
+
+        mRecycler.setLayoutManager(mManager);
+        mRecycler.setAdapter(mAdapter);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mNotificationReceiver,
+                NotificationReceiver.getIntentFilter());
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotificationReceiver);
+    }
+
+    private void onNotification(StatusBarNotification notification) {
+        // TODO: What other information is there besides the Notification object?
+        Log.d(TAG, "onNotification: " + notification);
+        mAdapter.add(notification.getNotification());
+    }
+
 
     private void showNotification() {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
@@ -36,27 +81,6 @@ public class MainActivity extends FragmentActivity implements
                 .build();
 
         NotificationManagerCompat.from(this).notify(0, notification);
-        bindNotification(notification);
-    }
-
-    private void bindNotification(final Notification notification) {
-        NotificationView nv = (NotificationView) findViewById(R.id.view_notification);
-        nv.bind(notification);
-        nv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notification.contentIntent == null) {
-                    Log.w(TAG, "No content intent for: " + notification);
-                    return;
-                }
-
-                try {
-                    notification.contentIntent.send();
-                } catch (PendingIntent.CanceledException e) {
-                    Log.e(TAG, "Can't launch", e);
-                }
-            }
-        });
     }
 
     private void launchNotificationAccessSettings() {
