@@ -23,8 +23,12 @@ public class NotificationService extends NotificationListenerService {
             }
         }
 
+        // Send the notification
         Intent intent = NotificationReceiver.getBroadcastIntent(notification);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        // Cancel it
+        cancelNotification(notification.getKey());
     }
 
     @Override

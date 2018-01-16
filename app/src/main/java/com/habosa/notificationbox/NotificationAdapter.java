@@ -2,11 +2,14 @@ package com.habosa.notificationbox;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,17 +48,30 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private NotificationView mNotificationView;
+        private ImageView mIconView;
+        private TextView mAppNameView;
+        private TextView mTimeView;
+        private TextView mTitleView;
+        private TextView mBodyView;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mNotificationView = (NotificationView) itemView.findViewById(R.id.item_view_notification);
+            mIconView = itemView.findViewById(R.id.notification_image_icon);
+            mAppNameView = itemView.findViewById(R.id.notification_text_app_name);
+            mTimeView = itemView.findViewById(R.id.notification_text_time);
+            mTitleView = itemView.findViewById(R.id.notification_text_title);
+            mBodyView = itemView.findViewById(R.id.notification_text_body);
         }
 
         public void bind(final Notification notification) {
-            mNotificationView.bind(notification);
-            mNotificationView.setOnClickListener(new View.OnClickListener() {
+            Bundle extras = notification.extras;
+
+            // TODO: Complete
+            // TODO: Turn into a custom view that binds Notification
+            mTitleView.setText(extras.getString(Notification.EXTRA_TITLE));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (notification.contentIntent == null) {

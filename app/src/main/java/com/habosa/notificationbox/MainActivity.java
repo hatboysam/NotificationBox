@@ -1,15 +1,18 @@
 package com.habosa.notificationbox;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -69,11 +72,27 @@ public class MainActivity extends AppCompatActivity implements
         mAdapter.add(notification.getNotification());
     }
 
-
     private void showNotification() {
+        String channelId = "test-channel";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    channelId, "Test Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+
+            // Configure the notification channel.
+            notificationChannel.setDescription("Test channel description");
+            notificationChannel.enableVibration(true);
+
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.createNotificationChannel(notificationChannel);
+            }
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(Settings.ACTION_BLUETOOTH_SETTINGS), 0);
-        final Notification notification = new NotificationCompat.Builder(this)
+
+        final Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle("Launch Bluetooth Settings")
                 .setContentText("If you click this, they will come.")
                 .setSmallIcon(R.mipmap.ic_launcher)
