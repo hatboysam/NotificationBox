@@ -2,6 +2,7 @@ package com.habosa.notificationbox;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -43,12 +44,15 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.button_enable).setOnClickListener(this);
         findViewById(R.id.button_request).setOnClickListener(this);
 
-        mRecycler = (RecyclerView) findViewById(R.id.notifications_recycler);
+        mRecycler = findViewById(R.id.notifications_recycler);
         mAdapter = new NotificationAdapter();
         mManager = new LinearLayoutManager(this);
 
         mRecycler.setLayoutManager(mManager);
         mRecycler.setAdapter(mAdapter);
+
+        // TODO: Should I have to do this?  If so where?
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
@@ -72,7 +76,17 @@ public class MainActivity extends AppCompatActivity implements
 
     private void requestNotifications() {
         mAdapter.clear();
-        MessageSender.sendMessage(this, new NotificationRequest());
+        MessageSender.send(this, new NotificationRequest());
+    }
+
+    private boolean hasNotificationPermissions() {
+        // TODO: Where does this magic string come from?
+        String notificationListenerString = Settings.Secure.getString(getContentResolver(),"enabled_notification_listeners");
+        if (notificationListenerString == null || !notificationListenerString.contains(getPackageName())) {
+           return false;
+        }
+
+        return true;
     }
 
     private void launchNotificationAccessSettings() {

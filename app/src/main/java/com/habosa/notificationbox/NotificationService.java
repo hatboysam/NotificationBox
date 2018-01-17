@@ -13,7 +13,8 @@ import com.habosa.notificationbox.messages.NotificationResult;
 
 public class NotificationService extends NotificationListenerService {
 
-    private static String TAG = "NotificationService";
+    private static final String TAG = "NotificationService";
+
     private MessageReceiver<NotificationRequest> mReceiver =
             new MessageReceiver<NotificationRequest>(NotificationRequest.class) {
                 @Override
@@ -23,8 +24,16 @@ public class NotificationService extends NotificationListenerService {
             };
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate");
+    }
+
+    @Override
     public void onListenerConnected() {
         super.onListenerConnected();
+
+        Log.d(TAG, "onListenerConnected");
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mReceiver, MessageReceiver.getFilter());
     }
@@ -32,6 +41,8 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public void onListenerDisconnected() {
         super.onListenerDisconnected();
+
+        Log.d(TAG, "onListenerDisconnected");
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mReceiver);
     }
@@ -49,15 +60,16 @@ public class NotificationService extends NotificationListenerService {
         }
 
         // Send the notification
-        MessageSender.sendMessage(this, new NotificationResult(notification));
+        MessageSender.send(this, new NotificationResult(notification));
 
         // TODO: Cancel it
         // cancelNotification(notification.getKey());
     }
 
     private void onMessagesRequested() {
+        Log.d(TAG, "onMessagesRequested");
         for (StatusBarNotification sbn : getActiveNotifications()) {
-            MessageSender.sendMessage(this, new NotificationResult(sbn));
+            MessageSender.send(this, new NotificationResult(sbn));
         }
     }
 
