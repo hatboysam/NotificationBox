@@ -1,15 +1,40 @@
 package com.habosa.notificationbox;
 
 import android.app.Notification;
-import android.content.Intent;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.habosa.notificationbox.messages.MessageReceiver;
+import com.habosa.notificationbox.messages.MessageSender;
+import com.habosa.notificationbox.messages.NotificationRequest;
+import com.habosa.notificationbox.messages.NotificationResult;
+
 public class NotificationService extends NotificationListenerService {
 
     private static String TAG = "NotificationService";
+    private MessageReceiver<NotificationRequest> mReceiver =
+            new MessageReceiver<NotificationRequest>(NotificationRequest.class) {
+                @Override
+                public void onMessage(NotificationRequest message) {
+                    onMessagesRequested();
+                }
+            };
+
+    @Override
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mReceiver, MessageReceiver.getFilter());
+    }
+
+    @Override
+    public void onListenerDisconnected() {
+        super.onListenerDisconnected();
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mReceiver);
+    }
 
     @Override
     public void onNotificationPosted(StatusBarNotification notification) {
@@ -24,11 +49,16 @@ public class NotificationService extends NotificationListenerService {
         }
 
         // Send the notification
-        Intent intent = NotificationReceiver.getBroadcastIntent(notification);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        MessageSender.sendMessage(this, new NotificationResult(notification));
 
-        // Cancel it
-        cancelNotification(notification.getKey());
+        // TODO: Cancel it
+        // cancelNotification(notification.getKey());
+    }
+
+    private void onMessagesRequested() {
+        for (StatusBarNotification sbn : getActiveNotifications()) {
+            MessageSender.sendMessage(this, new NotificationResult(sbn));
+        }
     }
 
     @Override

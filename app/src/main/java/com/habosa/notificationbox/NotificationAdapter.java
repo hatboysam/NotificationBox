@@ -2,7 +2,12 @@ package com.habosa.notificationbox;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.service.notification.StatusBarNotification;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by samstern on 1/15/18.
@@ -21,7 +27,7 @@ import java.util.List;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private static final String TAG = "NotificationAdapter";
-    private List<Notification> mNotifications = new ArrayList<>();
+    private List<StatusBarNotification> mNotifications = new ArrayList<>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,9 +47,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return mNotifications.size();
     }
 
-    public void add(Notification notification) {
-        mNotifications.add(notification);
+    public void add(StatusBarNotification sbn) {
+        mNotifications.add(sbn);
         notifyItemInserted(getItemCount() - 1);
+    }
+
+    public void clear() {
+        mNotifications.clear();
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -64,12 +75,42 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             mBodyView = itemView.findViewById(R.id.notification_text_body);
         }
 
-        public void bind(final Notification notification) {
+        private Context getContext() {
+            return itemView.getContext();
+        }
+
+        public void bind(StatusBarNotification sbn) {
+            final Notification notification = sbn.getNotification();
             Bundle extras = notification.extras;
 
-            // TODO: Complete
             // TODO: Turn into a custom view that binds Notification
+
+            String packageName = sbn.getPackageName();
+            PackageManager pm = getContext().getPackageManager();
+            String appName = "Unknown App";
+
+            // TODO: Better default
+            Drawable icon = getContext().getDrawable(android.R.drawable.ic_dialog_alert);
+
+            try {
+                ApplicationInfo info = pm.getApplicationInfo(packageName, 0);
+                appName = pm.getApplicationLabel(info).toString();
+                icon = pm.getApplicationIcon(info);
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.e(TAG, "getApplicationInfo", e);
+            }
+
+            // TODO: Better time estimate
+            long postTime = sbn.getPostTime();
+            long now = System.currentTimeMillis();
+            long hoursAgo = TimeUnit.MILLISECONDS.toHours(now - postTime);
+            String timeString = "" + hoursAgo + "h";
+
+            mIconView.setImageDrawable(icon);
+            mAppNameView.setText(appName);
+            mTimeView.setText(timeString);
             mTitleView.setText(extras.getString(Notification.EXTRA_TITLE));
+            mBodyView.setText(extras.getString(Notification.EXTRA_TEXT));
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

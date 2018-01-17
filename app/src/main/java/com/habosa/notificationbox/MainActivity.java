@@ -1,22 +1,19 @@
 package com.habosa.notificationbox;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+
+import com.habosa.notificationbox.messages.MessageReceiver;
+import com.habosa.notificationbox.messages.MessageSender;
+import com.habosa.notificationbox.messages.NotificationRequest;
+import com.habosa.notificationbox.messages.NotificationResult;
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener {
@@ -25,12 +22,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
 
-    private NotificationReceiver mNotificationReceiver = new NotificationReceiver() {
-        @Override
-        public void onNotification(StatusBarNotification notification) {
-            MainActivity.this.onNotification(notification);
-        }
-    };
+    private MessageReceiver<NotificationResult> mNotificationReceiver =
+            new MessageReceiver<NotificationResult>(NotificationResult.class) {
+                @Override
+                public void onMessage(NotificationResult message) {
+                    onNotification(message.get());
+                }
+            };
+
 
     private RecyclerView mRecycler;
     private NotificationAdapter mAdapter;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.button_enable).setOnClickListener(this);
-        findViewById(R.id.button_notify).setOnClickListener(this);
+        findViewById(R.id.button_request).setOnClickListener(this);
 
         mRecycler = (RecyclerView) findViewById(R.id.notifications_recycler);
         mAdapter = new NotificationAdapter();
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(mNotificationReceiver,
-                NotificationReceiver.getIntentFilter());
+                MessageReceiver.getFilter());
     }
 
 
@@ -67,39 +66,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void onNotification(StatusBarNotification notification) {
-        // TODO: What other information is there besides the Notification object?
         Log.d(TAG, "onNotification: " + notification);
-        mAdapter.add(notification.getNotification());
+        mAdapter.add(notification);
     }
 
-    private void showNotification() {
-        String channelId = "test-channel";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(
-                    channelId, "Test Notifications", NotificationManager.IMPORTANCE_DEFAULT);
-
-            // Configure the notification channel.
-            notificationChannel.setDescription("Test channel description");
-            notificationChannel.enableVibration(true);
-
-            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (manager != null) {
-                manager.createNotificationChannel(notificationChannel);
-            }
-        }
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(Settings.ACTION_BLUETOOTH_SETTINGS), 0);
-
-        final Notification notification = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("Launch Bluetooth Settings")
-                .setContentText("If you click this, they will come.")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .build();
-
-        NotificationManagerCompat.from(this).notify(0, notification);
+    private void requestNotifications() {
+        mAdapter.clear();
+        MessageSender.sendMessage(this, new NotificationRequest());
     }
 
     private void launchNotificationAccessSettings() {
@@ -112,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.button_enable:
                 launchNotificationAccessSettings();
                 break;
-            case R.id.button_notify:
-                showNotification();
+            case R.id.button_request:
+                requestNotifications();
                 break;
         }
     }
