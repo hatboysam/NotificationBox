@@ -1,6 +1,5 @@
 package com.habosa.notificationbox;
 
-import android.app.Notification;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
@@ -52,11 +51,9 @@ public class NotificationService extends NotificationListenerService {
         super.onNotificationPosted(notification);
         Log.d(TAG, "onNotificationPosted:" + notification.toString());
 
-        Notification.Action[] actions = notification.getNotification().actions;
-        if (actions != null) {
-            for (Notification.Action action : actions) {
-                Log.d(TAG, "action:" + action.title);
-            }
+        if (!shouldKeepNotification(notification)) {
+            Log.d(TAG, "onNotificationPosted: ignoring.");
+            return;
         }
 
         // Send the notification
@@ -66,10 +63,22 @@ public class NotificationService extends NotificationListenerService {
         // cancelNotification(notification.getKey());
     }
 
+    private boolean shouldKeepNotification(StatusBarNotification notification) {
+        // TODO: Why does this not ignore music?
+        if (notification.isOngoing()) {
+            return false;
+        }
+
+        return true;
+    }
+
     private void onMessagesRequested() {
         Log.d(TAG, "onMessagesRequested");
         for (StatusBarNotification sbn : getActiveNotifications()) {
-            MessageSender.send(this, new NotificationResult(sbn));
+            if (shouldKeepNotification(sbn)) {
+                MessageSender.send(this, new NotificationResult(sbn));
+            }
+
         }
     }
 

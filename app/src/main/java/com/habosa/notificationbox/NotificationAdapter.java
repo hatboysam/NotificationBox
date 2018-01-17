@@ -112,6 +112,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             mTitleView.setText(extras.getString(Notification.EXTRA_TITLE));
             mBodyView.setText(extras.getString(Notification.EXTRA_TEXT));
 
+            // TODO: Need to bind other actions like "Copy" and "Share" on Pushbullet
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
