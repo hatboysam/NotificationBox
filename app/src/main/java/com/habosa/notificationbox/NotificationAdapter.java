@@ -100,17 +100,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 Log.e(TAG, "getApplicationInfo", e);
             }
 
-            // TODO: Better time estimate
-            long postTime = sbn.getPostTime();
-            long now = System.currentTimeMillis();
-            long hoursAgo = TimeUnit.MILLISECONDS.toHours(now - postTime);
-            String timeString = "" + hoursAgo + "h";
+            long diff = System.currentTimeMillis() - sbn.getPostTime();
+            long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
+            long hoursAgo = TimeUnit.MILLISECONDS.toHours(diff);
+            long daysAgo = TimeUnit.MILLISECONDS.toDays(diff);
+
+            String timeString;
+            if (minutesAgo < 1) {
+                timeString = "now";
+            } else if (minutesAgo < 60) {
+                timeString = "" + minutesAgo + "m";
+            } else if (hoursAgo < 24) {
+                timeString = "" + hoursAgo + "h";
+            } else {
+                timeString = "" + daysAgo + "d";
+            }
 
             mIconView.setImageDrawable(icon);
             mAppNameView.setText(appName);
             mTimeView.setText(timeString);
-            mTitleView.setText(extras.getString(Notification.EXTRA_TITLE));
-            mBodyView.setText(extras.getString(Notification.EXTRA_TEXT));
+            mTitleView.setText(extras.getCharSequence(Notification.EXTRA_TITLE));
+            mBodyView.setText(extras.getCharSequence(Notification.EXTRA_TEXT));
 
             // TODO: Need to bind other actions like "Copy" and "Share" on Pushbullet
             itemView.setOnClickListener(new View.OnClickListener() {

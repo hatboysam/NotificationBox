@@ -1,5 +1,7 @@
 package com.habosa.notificationbox;
 
+import android.app.Notification;
+import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
@@ -57,6 +59,7 @@ public class NotificationService extends NotificationListenerService {
         }
 
         // Send the notification
+        // TODO: De-dupe on IDs
         MessageSender.send(this, new NotificationResult(notification));
 
         // TODO: Cancel it
@@ -64,8 +67,21 @@ public class NotificationService extends NotificationListenerService {
     }
 
     private boolean shouldKeepNotification(StatusBarNotification notification) {
-        // TODO: Why does this not ignore music?
+        Bundle extras = notification.getNotification().extras;
+
+        Log.d(TAG, "Keys for :" + notification);
+        for (String key : extras.keySet()) {
+            Log.d(TAG, "\t" + key);
+        }
+
+        // Ongoing notification like USB debugging, non dismissable
         if (notification.isOngoing()) {
+            return false;
+        }
+
+        // Ongoing media notification
+        // TODO: This catches Play Music but not BeyondPod
+        if (extras.containsKey(Notification.EXTRA_MEDIA_SESSION)) {
             return false;
         }
 

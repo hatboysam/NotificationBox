@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
+    android:background="?attr/selectableItemBackground"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:background="?attr/selectableItemBackground">
+    android:paddingRight="8dp">
 
     <ImageView
         android:id="@+id/notification_image_icon"
@@ -24,16 +23,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="MyApp"
         app:layout_constraintStart_toEndOf="@+id/notification_image_icon"
-        app:layout_constraintTop_toTopOf="@+id/notification_image_icon" />
+        app:layout_constraintTop_toTopOf="@+id/notification_image_icon"
+        tools:text="MyApp" />
 
     <TextView
         android:id="@+id/notification_time_bullet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="•"
+        android:text="@string/divider_bullet"
         app:layout_constraintStart_toEndOf="@+id/notification_text_app_name"
         app:layout_constraintTop_toTopOf="@+id/notification_text_app_name" />
 
@@ -42,19 +41,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="3h"
         app:layout_constraintStart_toEndOf="@+id/notification_time_bullet"
-        app:layout_constraintTop_toTopOf="@+id/notification_text_app_name" />
+        app:layout_constraintTop_toTopOf="@+id/notification_text_app_name"
+        tools:text="3h" />
 
     <TextView
         android:id="@+id/notification_text_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Content Title"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/notification_image_icon"
-        app:layout_constraintTop_toBottomOf="@+id/notification_text_app_name" />
+        app:layout_constraintTop_toBottomOf="@+id/notification_text_app_name"
+        tools:text="Content Title" />
 
     <TextView
         android:id="@+id/notification_text_body"
@@ -64,9 +63,17 @@
         android:layout_marginStart="8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Content body, much longer and a whole thing and it just can be so long you don't know what to do."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/notification_text_title"
-        app:layout_constraintTop_toBottomOf="@+id/notification_text_title" />
+        app:layout_constraintTop_toBottomOf="@+id/notification_text_title"
+        tools:text="Content body, much longer and a whole thing and it just can be so long you don't know what to do." />
+
+    <View
+        android:id="@+id/bottom_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="#bebebe"
+        app:layout_constraintTop_toBottomOf="@+id/notification_text_body" />
 
 </android.support.constraint.ConstraintLayout>
