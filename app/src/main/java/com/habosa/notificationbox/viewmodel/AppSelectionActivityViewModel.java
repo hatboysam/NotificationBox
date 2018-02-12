@@ -14,6 +14,8 @@ import com.habosa.notificationbox.util.BackgroundUtils;
 import com.habosa.notificationbox.util.Resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -50,6 +52,13 @@ public class AppSelectionActivityViewModel extends AndroidViewModel {
 
                     displayInfos.add(new AppDisplayInfo(title, icon));
                 }
+
+                Collections.sort(displayInfos, new Comparator<AppDisplayInfo>() {
+                    @Override
+                    public int compare(AppDisplayInfo o1, AppDisplayInfo o2) {
+                        return o1.title.compareTo(o2.title);
+                    }
+                });
 
                 mAppsLiveData.postValue(Resource.forSuccess(displayInfos));
             }
