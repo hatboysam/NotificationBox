@@ -11,7 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
+import com.habosa.notificationbox.adapter.NotificationAdapter;
 import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
@@ -68,6 +71,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mViewModel.requestNotifications();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_select_apps:
+                startActivity(new Intent(this, AppSelectionActivity.class));
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private synchronized void onNotifications(List<StatusBarNotification> notifications) {

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">NotificationBox</string>
     <string name="divider_bullet">•</string>
+    <string name="select_apps">Select Apps</string>
 </resources>

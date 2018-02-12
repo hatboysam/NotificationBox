@@ -1,4 +1,4 @@
-package com.habosa.notificationbox;
+package com.habosa.notificationbox.adapter;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.habosa.notificationbox.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by samstern on 1/15/18.
  */
-
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private static final String TAG = "NotificationAdapter";
