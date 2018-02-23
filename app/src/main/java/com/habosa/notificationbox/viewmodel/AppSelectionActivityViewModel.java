@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 
 import com.habosa.notificationbox.model.AppDisplayInfo;
 import com.habosa.notificationbox.util.BackgroundUtils;
-import com.habosa.notificationbox.util.PreferenceUtils;
 import com.habosa.notificationbox.util.Resource;
 
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ public class AppSelectionActivityViewModel extends AndroidViewModel {
                     String packageName = info.packageName;
                     String title = mPackageManager.getApplicationLabel(info).toString();
                     Drawable icon = mPackageManager.getApplicationIcon(info);
-
                     displayInfos.add(new AppDisplayInfo(packageName, title, icon));
                 }
 
