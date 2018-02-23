@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -45,24 +46,27 @@ public class PreferenceUtils {
     }
 
     private void addToSelected(String packageName) {
-        Set<String> allSelected = getAllSelected();
+        Set<String> allSelected = new HashSet<>(getAllSelected());
         if (allSelected.contains(packageName)) {
             return;
         }
 
         allSelected.add(packageName);
-        mPrefs.edit()
-                .putStringSet(KEY_ALL_SELECTED, allSelected)
-                .apply();
+        setAllSelected(allSelected);
     }
 
     private void removeFromSelected(String packageName) {
-        Set<String> allSelected = getAllSelected();
+        Set<String> allSelected = new HashSet<>(getAllSelected());
         if (!allSelected.contains(packageName)) {
             return;
         }
 
         allSelected.remove(packageName);
+        setAllSelected(allSelected);
+    }
+
+    private void setAllSelected(Set<String> allSelected) {
+        Log.d(TAG, "setAllSelected:" + allSelected);
         mPrefs.edit()
                 .putStringSet(KEY_ALL_SELECTED, allSelected)
                 .apply();
