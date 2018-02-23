@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 
 import com.habosa.notificationbox.model.AppDisplayInfo;
 import com.habosa.notificationbox.util.BackgroundUtils;
+import com.habosa.notificationbox.util.PreferenceUtils;
 import com.habosa.notificationbox.util.Resource;
 
 import java.util.ArrayList;
@@ -47,16 +48,17 @@ public class AppSelectionActivityViewModel extends AndroidViewModel {
 
                 List<AppDisplayInfo> displayInfos = new ArrayList<>();
                 for (ApplicationInfo info : infos) {
+                    String packageName = info.packageName;
                     String title = mPackageManager.getApplicationLabel(info).toString();
                     Drawable icon = mPackageManager.getApplicationIcon(info);
 
-                    displayInfos.add(new AppDisplayInfo(title, icon));
+                    displayInfos.add(new AppDisplayInfo(packageName, title, icon));
                 }
 
                 Collections.sort(displayInfos, new Comparator<AppDisplayInfo>() {
                     @Override
                     public int compare(AppDisplayInfo o1, AppDisplayInfo o2) {
-                        return o1.title.compareTo(o2.title);
+                        return o1.name.compareTo(o2.name);
                     }
                 });
 

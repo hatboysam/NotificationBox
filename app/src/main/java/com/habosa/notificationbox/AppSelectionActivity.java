@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.habosa.notificationbox.adapter.AppAdapter;
 import com.habosa.notificationbox.model.AppDisplayInfo;
+import com.habosa.notificationbox.util.PreferenceUtils;
 import com.habosa.notificationbox.util.Resource;
 import com.habosa.notificationbox.viewmodel.AppSelectionActivityViewModel;
 
@@ -27,10 +28,11 @@ public class AppSelectionActivity extends AppCompatActivity {
     private static final String TAG = "AppSelectionActivity";
 
     private AppSelectionActivityViewModel mViewModel;
+    private PreferenceUtils mPrefUtils;
 
     private RecyclerView mAppRecycler;
     private ProgressBar mProgressBar;
-    private AppAdapter mAppAdapter = new AppAdapter();
+    private AppAdapter mAppAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,9 @@ public class AppSelectionActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.progress_app);
 
         mViewModel = ViewModelProviders.of(this).get(AppSelectionActivityViewModel.class);
+        mPrefUtils = new PreferenceUtils(this);
+
+        mAppAdapter = new AppAdapter(mPrefUtils);
 
         mAppRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAppRecycler.setAdapter(mAppAdapter);

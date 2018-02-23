@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
 import com.habosa.notificationbox.model.AppDisplayInfo;
+import com.habosa.notificationbox.util.PreferenceUtils;
 
 import java.util.List;
 
@@ -19,8 +21,10 @@ import java.util.List;
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
     private List<AppDisplayInfo> mInfos;
+    private final PreferenceUtils mPrefUtils;
 
-    public AppAdapter() {
+    public AppAdapter(PreferenceUtils prefUtils) {
+        mPrefUtils = prefUtils;
     }
 
     @Override
@@ -51,7 +55,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView mIconView;
         private TextView mTitleView;
@@ -63,14 +67,25 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             mIconView = itemView.findViewById(R.id.item_app_icon);
             mTitleView = itemView.findViewById(R.id.item_app_title);
             mCheckBox = itemView.findViewById(R.id.item_app_checkbox);
-
-            // TODO: Checked change listener?
         }
 
         public void bind(AppDisplayInfo info) {
             // TODO: Does this need to be done on a bg thread?
-            mTitleView.setText(info.title);
+            mTitleView.setText(info.name);
             mIconView.setImageDrawable(info.icon);
+
+            // Set initial checked state
+            final String packageName = info.packageName;
+            boolean selected = mPrefUtils.getAppSelected(packageName);
+            mCheckBox.setChecked(selected);
+
+            // Liten for checked changes
+            mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mPrefUtils.setAppSelected(packageName, isChecked);
+                }
+            });
         }
     }
 }

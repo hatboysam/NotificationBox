@@ -3,15 +3,17 @@ package com.habosa.notificationbox.model;
 import android.graphics.drawable.Drawable;
 
 /**
- * Created by samstern on 2/11/18.
+ * Information needed to display an app.
  */
 public class AppDisplayInfo {
 
-    public final String title;
+    public final String packageName;
+    public final String name;
     public final Drawable icon;
 
-    public AppDisplayInfo(String title, Drawable icon) {
-        this.title = title;
+    public AppDisplayInfo(String packageName, String name, Drawable icon) {
+        this.packageName = packageName;
+        this.name = name;
         this.icon = icon;
     }
 
