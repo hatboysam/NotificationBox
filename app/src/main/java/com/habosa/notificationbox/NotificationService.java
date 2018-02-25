@@ -7,10 +7,14 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.habosa.notificationbox.data.AppDatabase;
+import com.habosa.notificationbox.data.NotificationDao;
 import com.habosa.notificationbox.messages.MessageReceiver;
 import com.habosa.notificationbox.messages.MessageSender;
 import com.habosa.notificationbox.messages.NotificationRequest;
 import com.habosa.notificationbox.messages.NotificationResult;
+import com.habosa.notificationbox.model.NotificationInfo;
+import com.habosa.notificationbox.util.BackgroundUtils;
 
 public class NotificationService extends NotificationListenerService {
 
@@ -24,10 +28,14 @@ public class NotificationService extends NotificationListenerService {
                 }
             };
 
+    private NotificationDao mNotificationDao;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
+
+        mNotificationDao = AppDatabase.getInstance(getApplicationContext()).notificationDao();
     }
 
     @Override
@@ -58,12 +66,24 @@ public class NotificationService extends NotificationListenerService {
             return;
         }
 
-        // Send the notification
-        // TODO: De-dupe on IDs
-        MessageSender.send(this, new NotificationResult(notification));
+        // Create NotificationInfo
+        NotificationInfo info = new NotificationInfo(notification);
+
+        // Store the notification
+        insert(info);
 
         // TODO: Cancel it
         // cancelNotification(notification.getKey());
+    }
+
+    private void insert(final NotificationInfo info) {
+        // TODO: I need to do more sane thread management.
+        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                mNotificationDao.insert(info);
+            }
+        });
     }
 
     private boolean shouldKeepNotification(StatusBarNotification notification) {
