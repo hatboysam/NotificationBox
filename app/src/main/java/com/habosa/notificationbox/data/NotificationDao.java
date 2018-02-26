@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface NotificationDao {
 
-    @Query("SELECT * FROM NotificationInfo")
+    @Query("SELECT * FROM NotificationInfo ORDER BY postTime DESC")
     List<NotificationInfo> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

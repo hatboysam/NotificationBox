@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.support.v4.app.NotificationCompatExtras;
 import android.util.Log;
 
 import com.habosa.notificationbox.data.AppDatabase;
@@ -77,6 +78,11 @@ public class NotificationService extends NotificationListenerService {
 
         // Ongoing notification like USB debugging, non dismissable
         if (notification.isOngoing()) {
+            return false;
+        }
+
+        // Ignore "group summary" notifications
+        if (extras.getBoolean(NotificationCompatExtras.EXTRA_GROUP_SUMMARY, false)) {
             return false;
         }
 
