@@ -4,17 +4,16 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.habosa.notificationbox.adapter.NotificationAdapter;
+import com.habosa.notificationbox.model.NotificationInfo;
 import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
@@ -49,17 +48,16 @@ public class MainActivity extends AppCompatActivity {
         mRecycler.setAdapter(mAdapter);
 
         // Observe notifications
-        mViewModel.getNotifications().observe(this,
-                new Observer<List<StatusBarNotification>>() {
-                    @Override
-                    public void onChanged(@Nullable List<StatusBarNotification> notifications) {
-                        if (notifications == null) {
-                            return;
-                        }
+        mViewModel.getNotificationInfo().observe(this, new Observer<List<NotificationInfo>>() {
+            @Override
+            public void onChanged(@Nullable List<NotificationInfo> notificationInfos) {
+                if (notificationInfos == null) {
+                    return;
+                }
 
-                        onNotifications(notifications);
-                    }
-                });
+                onNotificationInfos(notificationInfos);
+            }
+        });
     }
 
     @Override
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             launchNotificationAccessSettings();
         }
 
-        mViewModel.requestNotifications();
+        mViewModel.requestNotificationInfos();
     }
 
     @Override
@@ -90,12 +88,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private synchronized void onNotifications(List<StatusBarNotification> notifications) {
-        Log.d(TAG, "onNotifications: " + notifications.size());
-
+    private void onNotificationInfos(List<NotificationInfo> notificationInfos) {
         mAdapter.clear();
-        for (StatusBarNotification sbn : notifications) {
-            mAdapter.add(sbn);
+
+        for (NotificationInfo info : notificationInfos) {
+            mAdapter.add(info);
         }
     }
 

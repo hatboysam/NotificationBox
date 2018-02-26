@@ -3,10 +3,13 @@ package com.habosa.notificationbox.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.service.notification.StatusBarNotification;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import com.habosa.notificationbox.livedata.NotificationsLiveData;
+import com.habosa.notificationbox.data.AppDatabase;
+import com.habosa.notificationbox.data.NotificationDao;
+import com.habosa.notificationbox.model.NotificationInfo;
+import com.habosa.notificationbox.util.BackgroundUtils;
 
 import java.util.List;
 
@@ -15,19 +18,28 @@ import java.util.List;
  */
 public class MainActivityViewModel extends AndroidViewModel {
 
-    private NotificationsLiveData mNotifications;
+    private NotificationDao mNotificationDao;
+    private MutableLiveData<List<NotificationInfo>> mNotificationInfos;
+
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
-        mNotifications = new NotificationsLiveData(application);
+        mNotificationDao = AppDatabase.getInstance(application).notificationDao();
+        mNotificationInfos = new MutableLiveData<>();
     }
 
-    public LiveData<List<StatusBarNotification>> getNotifications() {
-        return mNotifications;
+    public LiveData<List<NotificationInfo>> getNotificationInfo() {
+        return mNotificationInfos;
     }
 
-    public void requestNotifications() {
-        mNotifications.refresh();
+    public void requestNotificationInfos() {
+        // TODO: Move to repository.
+        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                mNotificationInfos.postValue(mNotificationDao.getAll());
+            }
+        });
     }
 
 }

@@ -4,29 +4,16 @@ import android.app.Notification;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.habosa.notificationbox.data.AppDatabase;
 import com.habosa.notificationbox.data.NotificationDao;
-import com.habosa.notificationbox.messages.MessageReceiver;
-import com.habosa.notificationbox.messages.MessageSender;
-import com.habosa.notificationbox.messages.NotificationRequest;
-import com.habosa.notificationbox.messages.NotificationResult;
 import com.habosa.notificationbox.model.NotificationInfo;
 import com.habosa.notificationbox.util.BackgroundUtils;
 
 public class NotificationService extends NotificationListenerService {
 
     private static final String TAG = "NotificationService";
-
-    private MessageReceiver<NotificationRequest> mReceiver =
-            new MessageReceiver<NotificationRequest>(NotificationRequest.class) {
-                @Override
-                public void onMessage(NotificationRequest message) {
-                    onMessagesRequested();
-                }
-            };
 
     private NotificationDao mNotificationDao;
 
@@ -41,19 +28,13 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
-
         Log.d(TAG, "onListenerConnected");
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mReceiver, MessageReceiver.getFilter());
     }
 
     @Override
     public void onListenerDisconnected() {
         super.onListenerDisconnected();
-
         Log.d(TAG, "onListenerDisconnected");
-        LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -106,16 +87,6 @@ public class NotificationService extends NotificationListenerService {
         }
 
         return true;
-    }
-
-    private void onMessagesRequested() {
-        Log.d(TAG, "onMessagesRequested");
-        for (StatusBarNotification sbn : getActiveNotifications()) {
-            if (shouldKeepNotification(sbn)) {
-                MessageSender.send(this, new NotificationResult(sbn));
-            }
-
-        }
     }
 
     @Override

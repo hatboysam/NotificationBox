@@ -1,13 +1,9 @@
 package com.habosa.notificationbox.adapter;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.service.notification.StatusBarNotification;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
+import com.habosa.notificationbox.model.NotificationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private static final String TAG = "NotificationAdapter";
-    private List<StatusBarNotification> mNotifications = new ArrayList<>();
+    private List<NotificationInfo> mNotifications = new ArrayList<>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -48,8 +45,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return mNotifications.size();
     }
 
-    public void add(StatusBarNotification sbn) {
-        mNotifications.add(sbn);
+    public void add(NotificationInfo info) {
+        mNotifications.add(info);
         notifyItemInserted(getItemCount() - 1);
     }
 
@@ -80,13 +77,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             return itemView.getContext();
         }
 
-        public void bind(StatusBarNotification sbn) {
-            final Notification notification = sbn.getNotification();
-            Bundle extras = notification.extras;
-
+        public void bind(NotificationInfo info) {
             // TODO: Turn into a custom view that binds Notification
 
-            String packageName = sbn.getPackageName();
+            String packageName = info.getPackageName();
             PackageManager pm = getContext().getPackageManager();
             String appName = "Unknown App";
 
@@ -94,14 +88,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             Drawable icon = getContext().getDrawable(android.R.drawable.ic_dialog_alert);
 
             try {
-                ApplicationInfo info = pm.getApplicationInfo(packageName, 0);
-                appName = pm.getApplicationLabel(info).toString();
-                icon = pm.getApplicationIcon(info);
+                ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
+                appName = pm.getApplicationLabel(appInfo).toString();
+                icon = pm.getApplicationIcon(appInfo);
             } catch (PackageManager.NameNotFoundException e) {
                 Log.e(TAG, "getApplicationInfo", e);
             }
 
-            long diff = System.currentTimeMillis() - sbn.getPostTime();
+            long diff = System.currentTimeMillis() - info.getPostTime();
             long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
             long hoursAgo = TimeUnit.MILLISECONDS.toHours(diff);
             long daysAgo = TimeUnit.MILLISECONDS.toDays(diff);
@@ -120,25 +114,26 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             mIconView.setImageDrawable(icon);
             mAppNameView.setText(appName);
             mTimeView.setText(timeString);
-            mTitleView.setText(extras.getCharSequence(Notification.EXTRA_TITLE));
-            mBodyView.setText(extras.getCharSequence(Notification.EXTRA_TEXT));
+            mTitleView.setText(info.getTitle());
+            mBodyView.setText(info.getBody());
 
+            // TODO: Actions
             // TODO: Need to bind other actions like "Copy" and "Share" on Pushbullet
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (notification.contentIntent == null) {
-                        Log.w(TAG, "No content intent for: " + notification);
-                        return;
-                    }
-
-                    try {
-                        notification.contentIntent.send();
-                    } catch (PendingIntent.CanceledException e) {
-                        Log.e(TAG, "Can't launch", e);
-                    }
-                }
-            });
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (notification.contentIntent == null) {
+//                        Log.w(TAG, "No content intent for: " + notification);
+//                        return;
+//                    }
+//
+//                    try {
+//                        notification.contentIntent.send();
+//                    } catch (PendingIntent.CanceledException e) {
+//                        Log.e(TAG, "Can't launch", e);
+//                    }
+//                }
+//            });
         }
     }
 
