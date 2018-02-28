@@ -1,11 +1,7 @@
 package com.habosa.notificationbox.adapter;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
-import com.habosa.notificationbox.model.NotificationInfo;
+import com.habosa.notificationbox.model.NotificationDisplayInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private static final String TAG = "NotificationAdapter";
-    private List<NotificationInfo> mNotifications = new ArrayList<>();
+    private List<NotificationDisplayInfo> mNotifications = new ArrayList<>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,7 +41,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return mNotifications.size();
     }
 
-    public void add(NotificationInfo info) {
+    public void add(NotificationDisplayInfo info) {
         mNotifications.add(info);
         notifyItemInserted(getItemCount() - 1);
     }
@@ -77,25 +73,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             return itemView.getContext();
         }
 
-        public void bind(NotificationInfo info) {
+        public void bind(NotificationDisplayInfo displayInfo) {
             // TODO: Turn into a custom view that binds Notification
 
-            String packageName = info.getPackageName();
-            PackageManager pm = getContext().getPackageManager();
-            String appName = "Unknown App";
-
-            // TODO: Better default
-            Drawable icon = getContext().getDrawable(android.R.drawable.ic_dialog_alert);
-
-            try {
-                ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
-                appName = pm.getApplicationLabel(appInfo).toString();
-                icon = pm.getApplicationIcon(appInfo);
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "getApplicationInfo", e);
-            }
-
-            long diff = System.currentTimeMillis() - info.getPostTime();
+            long diff = System.currentTimeMillis() - displayInfo.info.getPostTime();
             long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
             long hoursAgo = TimeUnit.MILLISECONDS.toHours(diff);
             long daysAgo = TimeUnit.MILLISECONDS.toDays(diff);
@@ -111,11 +92,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 timeString = "" + daysAgo + "d";
             }
 
-            mIconView.setImageDrawable(icon);
-            mAppNameView.setText(appName);
+            mIconView.setImageDrawable(displayInfo.icon);
+            mAppNameView.setText(displayInfo.appName);
             mTimeView.setText(timeString);
-            mTitleView.setText(info.getTitle());
-            mBodyView.setText(info.getBody());
+            mTitleView.setText(displayInfo.info.getTitle());
+            mBodyView.setText(displayInfo.info.getBody());
 
             // TODO: Actions
             // TODO: Need to bind other actions like "Copy" and "Share" on Pushbullet

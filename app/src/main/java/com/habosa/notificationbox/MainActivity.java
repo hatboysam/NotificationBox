@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.habosa.notificationbox.adapter.NotificationAdapter;
-import com.habosa.notificationbox.model.NotificationInfo;
+import com.habosa.notificationbox.model.NotificationDisplayInfo;
 import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
@@ -48,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         mRecycler.setAdapter(mAdapter);
 
         // Observe notifications
-        mViewModel.getNotificationInfo().observe(this, new Observer<List<NotificationInfo>>() {
+        mViewModel.getNotifications().observe(this, new Observer<List<NotificationDisplayInfo>>() {
             @Override
-            public void onChanged(@Nullable List<NotificationInfo> notificationInfos) {
-                if (notificationInfos == null) {
+            public void onChanged(@Nullable List<NotificationDisplayInfo> displayInfos) {
+                if (displayInfos == null) {
                     return;
                 }
 
-                onNotificationInfos(notificationInfos);
+                onNotifications(displayInfos);
             }
         });
     }
@@ -88,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void onNotificationInfos(List<NotificationInfo> notificationInfos) {
+    private void onNotifications(@NonNull List<NotificationDisplayInfo> displayInfos) {
         mAdapter.clear();
 
-        for (NotificationInfo info : notificationInfos) {
-            mAdapter.add(info);
+        for (NotificationDisplayInfo ndi : displayInfos) {
+            mAdapter.add(ndi);
         }
     }
 
