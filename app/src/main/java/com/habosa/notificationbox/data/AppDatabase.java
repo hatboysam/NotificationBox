@@ -6,6 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.habosa.notificationbox.BuildConfig;
 import com.habosa.notificationbox.model.NotificationInfo;
 
 /**
@@ -19,8 +20,17 @@ public abstract class AppDatabase extends RoomDatabase {
     @NonNull
     public static AppDatabase getInstance(@NonNull Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                    AppDatabase.class, "app-database").build();
+            RoomDatabase.Builder<AppDatabase> builder =
+                    Room.databaseBuilder(
+                            context.getApplicationContext(),
+                            AppDatabase.class,
+                            "app-database");
+
+            if (BuildConfig.DEBUG) {
+                builder = builder.fallbackToDestructiveMigration();
+            }
+
+            INSTANCE = builder.build();
         }
 
         return INSTANCE;

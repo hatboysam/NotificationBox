@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
 import com.habosa.notificationbox.model.NotificationDisplayInfo;
+import com.habosa.notificationbox.notifications.NotificationActionCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             return itemView.getContext();
         }
 
-        public void bind(NotificationDisplayInfo displayInfo) {
+        public void bind(final NotificationDisplayInfo displayInfo) {
             // TODO: Turn into a custom view that binds Notification
 
             long diff = System.currentTimeMillis() - displayInfo.info.getPostTime();
@@ -98,23 +99,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             mTitleView.setText(displayInfo.info.getTitle());
             mBodyView.setText(displayInfo.info.getBody());
 
-            // TODO: Actions
-            // TODO: Need to bind other actions like "Copy" and "Share" on Pushbullet
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (notification.contentIntent == null) {
-//                        Log.w(TAG, "No content intent for: " + notification);
-//                        return;
-//                    }
-//
-//                    try {
-//                        notification.contentIntent.send();
-//                    } catch (PendingIntent.CanceledException e) {
-//                        Log.e(TAG, "Can't launch", e);
-//                    }
-//                }
-//            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: Snackbar
+                    // TODO: This click listener shoudl be in the Activity
+                    boolean launched = NotificationActionCache.launchAction(getContext(), displayInfo.info);
+                }
+            });
         }
     }
 

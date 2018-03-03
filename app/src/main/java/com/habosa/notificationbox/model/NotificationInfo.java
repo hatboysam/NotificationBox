@@ -4,17 +4,24 @@ import android.app.Notification;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
+import android.support.annotation.NonNull;
+
+import com.habosa.notificationbox.notifications.NotificationKey;
+import com.habosa.notificationbox.util.CustomConverters;
 
 /**
  * Model object for Notification display information.
  */
 @Entity(tableName = "NotificationInfo")
+@TypeConverters({CustomConverters.class})
 public class NotificationInfo {
 
     @PrimaryKey
-    private int id;
+    @NonNull
+    private NotificationKey key;
 
     // App Package Name
     @ColumnInfo(name = "packageName")
@@ -32,15 +39,13 @@ public class NotificationInfo {
     @ColumnInfo(name = "body")
     private String body;
 
-    // Actions
-    // TODO
-
     public NotificationInfo() {
-
+        // TODO: I really should not have to do this...
+        this.key = new NotificationKey("a:123:c");
     }
 
     public NotificationInfo(StatusBarNotification sbn) {
-        this.id = sbn.getId();
+        this.key = new NotificationKey(sbn);
         this.postTime = sbn.getPostTime();
         this.packageName = sbn.getPackageName();
 
@@ -54,12 +59,12 @@ public class NotificationInfo {
         }
     }
 
-    public int getId() {
-        return id;
+    public NotificationKey getKey() {
+        return key;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setKey(NotificationKey key) {
+        this.key = key;
     }
 
     public String getPackageName() {

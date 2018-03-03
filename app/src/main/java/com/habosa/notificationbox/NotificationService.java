@@ -10,13 +10,16 @@ import android.util.Log;
 import com.habosa.notificationbox.data.AppDatabase;
 import com.habosa.notificationbox.data.NotificationDao;
 import com.habosa.notificationbox.model.NotificationInfo;
+import com.habosa.notificationbox.notifications.NotificationActionCache;
 import com.habosa.notificationbox.util.BackgroundUtils;
+import com.habosa.notificationbox.util.PreferenceUtils;
 
 public class NotificationService extends NotificationListenerService {
 
     private static final String TAG = "NotificationService";
 
     private NotificationDao mNotificationDao;
+    private PreferenceUtils mPrefs;
 
     @Override
     public void onCreate() {
@@ -24,6 +27,7 @@ public class NotificationService extends NotificationListenerService {
         Log.d(TAG, "onCreate");
 
         mNotificationDao = AppDatabase.getInstance(getApplicationContext()).notificationDao();
+        mPrefs = new PreferenceUtils(this);
     }
 
     @Override
@@ -52,18 +56,21 @@ public class NotificationService extends NotificationListenerService {
         NotificationInfo info = new NotificationInfo(notification);
 
         // Store the notification
-        insert(info);
+        insert(info, notification);
 
-        // TODO: Cancel it
-        // cancelNotification(notification.getKey());
+        // Cancel the notification, it's ours now
+        cancelNotification(notification.getKey());
+
+        // TODO: We should have a long-standing notification showing how many things we have stored
     }
 
-    private void insert(final NotificationInfo info) {
+    private void insert(final NotificationInfo info, final StatusBarNotification sbn) {
         // TODO: I need to do more sane thread management.
         BackgroundUtils.EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
                 mNotificationDao.insert(info);
+                NotificationActionCache.put(info, sbn.getNotification().contentIntent);
             }
         });
     }
@@ -92,7 +99,8 @@ public class NotificationService extends NotificationListenerService {
             return false;
         }
 
-        return true;
+        // Check if we are watching this application
+        return mPrefs.getAppSelected(notification.getPackageName());
     }
 
     @Override
