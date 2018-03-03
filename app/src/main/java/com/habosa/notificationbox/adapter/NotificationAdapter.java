@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
 import com.habosa.notificationbox.model.NotificationDisplayInfo;
-import com.habosa.notificationbox.notifications.NotificationActionCache;
+import com.habosa.notificationbox.model.NotificationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,19 @@ import java.util.concurrent.TimeUnit;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private static final String TAG = "NotificationAdapter";
+
+    private final Listener mListener;
     private List<NotificationDisplayInfo> mNotifications = new ArrayList<>();
+
+    public interface Listener {
+
+        void onNotificationClicked(NotificationInfo info);
+
+    }
+
+    public NotificationAdapter(Listener listener) {
+        this.mListener = listener;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -52,7 +64,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView mIconView;
         private TextView mTimeView;
@@ -99,9 +111,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: Snackbar
-                    // TODO: This click listener shoudl be in the Activity
-                    boolean launched = NotificationActionCache.launchAction(getContext(), displayInfo.info);
+                    if (mListener != null) {
+                        mListener.onNotificationClicked(displayInfo.info);
+                    }
                 }
             });
         }

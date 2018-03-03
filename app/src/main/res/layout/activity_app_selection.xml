@@ -11,6 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"
         tools:listitem="@layout/item_app"
         tools:visibility="visible" />
 

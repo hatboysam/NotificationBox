@@ -41,6 +41,18 @@ public class MainActivityViewModel extends AndroidViewModel {
         return mNotificationInfos;
     }
 
+    public void removeNotification(final NotificationInfo info) {
+        // TODO: Move to repository
+        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                mNotificationDao.delete(info);
+            }
+        });
+
+        requestNotificationInfos();
+    }
+
     public void requestNotificationInfos() {
         // TODO: Move to repository.
         BackgroundUtils.EXECUTOR.execute(new Runnable() {
