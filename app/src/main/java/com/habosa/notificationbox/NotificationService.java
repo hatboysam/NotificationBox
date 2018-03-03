@@ -61,6 +61,7 @@ public class NotificationService extends NotificationListenerService {
         // Cancel the notification, it's ours now
         cancelNotification(notification.getKey());
 
+        // TODO: Send a broadcast here to force the app to reload if it's open
         // TODO: We should have a long-standing notification showing how many things we have stored
     }
 

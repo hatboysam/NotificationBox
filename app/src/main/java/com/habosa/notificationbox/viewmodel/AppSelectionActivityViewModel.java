@@ -50,7 +50,12 @@ public class AppSelectionActivityViewModel extends AndroidViewModel {
                     String packageName = info.packageName;
                     String title = mPackageManager.getApplicationLabel(info).toString();
                     Drawable icon = mPackageManager.getApplicationIcon(info);
-                    displayInfos.add(new AppDisplayInfo(packageName, title, icon));
+
+                    // Skip system apps that don't even have a name that's not their
+                    // package name
+                    if (!title.equals(packageName)) {
+                        displayInfos.add(new AppDisplayInfo(packageName, title, icon));
+                    }
                 }
 
                 Collections.sort(displayInfos, new Comparator<AppDisplayInfo>() {

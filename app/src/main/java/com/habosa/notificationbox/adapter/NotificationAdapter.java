@@ -55,7 +55,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView mIconView;
-        private TextView mAppNameView;
         private TextView mTimeView;
         private TextView mTitleView;
         private TextView mBodyView;
@@ -64,7 +63,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             super(itemView);
 
             mIconView = itemView.findViewById(R.id.notification_image_icon);
-            mAppNameView = itemView.findViewById(R.id.notification_text_app_name);
             mTimeView = itemView.findViewById(R.id.notification_text_time);
             mTitleView = itemView.findViewById(R.id.notification_text_title);
             mBodyView = itemView.findViewById(R.id.notification_text_body);
@@ -94,7 +92,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             }
 
             mIconView.setImageDrawable(displayInfo.icon);
-            mAppNameView.setText(displayInfo.appName);
             mTimeView.setText(timeString);
             mTitleView.setText(displayInfo.info.getTitle());
             mBodyView.setText(displayInfo.info.getBody());
