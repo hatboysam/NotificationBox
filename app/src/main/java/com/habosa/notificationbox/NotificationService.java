@@ -94,7 +94,14 @@ public class NotificationService extends NotificationListenerService {
         cancelNotification(notification.getKey());
 
         // Show a notification
-        showSummaryNotification();
+        // TODO: same deal
+        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                int count = mNotificationDao.count();
+                showSummaryNotification(count);
+            }
+        });
 
         // TODO: Send a broadcast here to force the app to reload if it's open
     }
@@ -110,7 +117,7 @@ public class NotificationService extends NotificationListenerService {
         });
     }
 
-    private void showSummaryNotification() {
+    private void showSummaryNotification(int count) {
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
 
         // Create channel
@@ -119,7 +126,7 @@ public class NotificationService extends NotificationListenerService {
             NotificationChannel channel = new NotificationChannel(
                     SUMMARY_CHANNEL_ID,
                     SUMMARY_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_LOW);
 
             channel.setDescription(SUMMARY_CHANNEL_DESC);
 
@@ -130,14 +137,19 @@ public class NotificationService extends NotificationListenerService {
         PendingIntent contentIntent = PendingIntent.getActivity(
                 this, 0, homeIntent, 0);
 
-        // TODO: show count and some example names
+        String title = getResources().getQuantityString(
+                R.plurals.notifications_summary_title, count, count);
+        String body = getString(R.string.notifications_summary_body);
+
         Notification notification = new NotificationCompat.Builder(this, SUMMARY_CHANNEL_ID)
                 .setChannelId(SUMMARY_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_off_white_24dp)
-                .setContentTitle("You have notifications!")
-                .setContentText("Open Notification Box to see them")
+                .setContentTitle(title)
+                .setContentText(body)
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
+                .setVibrate(null)
+                .setSound(null)
                 .build();
 
         manager.notify(SUMMARY_NOTIF_ID, notification);

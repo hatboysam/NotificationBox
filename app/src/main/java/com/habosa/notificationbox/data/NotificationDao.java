@@ -16,6 +16,9 @@ public interface NotificationDao {
     @Query("SELECT * FROM NotificationInfo ORDER BY postTime DESC")
     List<NotificationInfo> getAll();
 
+    @Query("SELECT COUNT(*) FROM NotificationInfo")
+    int count();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(NotificationInfo info);
 
