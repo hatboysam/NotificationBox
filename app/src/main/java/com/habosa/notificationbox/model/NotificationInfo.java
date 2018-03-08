@@ -8,6 +8,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.habosa.notificationbox.notifications.NotificationKey;
 import com.habosa.notificationbox.util.CustomConverters;
@@ -51,11 +52,13 @@ public class NotificationInfo {
 
         Bundle extras = sbn.getNotification().extras;
         if (extras.containsKey(Notification.EXTRA_TITLE)) {
-            this.title = extras.getCharSequence(Notification.EXTRA_TITLE).toString();
+            CharSequence title = extras.getCharSequence(Notification.EXTRA_TITLE);
+            this.title = title == null ? null : title.toString();
         }
 
         if (extras.containsKey(Notification.EXTRA_TEXT)) {
-            this.body = extras.getCharSequence(Notification.EXTRA_TEXT).toString();
+            CharSequence text = extras.getCharSequence(Notification.EXTRA_TEXT);
+            this.body = text == null ? null : text.toString();
         }
     }
 
@@ -83,6 +86,7 @@ public class NotificationInfo {
         this.postTime = postTime;
     }
 
+    @Nullable
     public String getTitle() {
         return title;
     }
@@ -91,6 +95,7 @@ public class NotificationInfo {
         this.title = title;
     }
 
+    @Nullable
     public String getBody() {
         return body;
     }

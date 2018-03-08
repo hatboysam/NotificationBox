@@ -11,11 +11,14 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.habosa.notificationbox.adapter.NotificationAdapter;
+import com.habosa.notificationbox.adapter.SwipeHelper;
 import com.habosa.notificationbox.model.NotificationDisplayInfo;
 import com.habosa.notificationbox.model.NotificationInfo;
 import com.habosa.notificationbox.notifications.NotificationActionCache;
@@ -23,7 +26,9 @@ import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NotificationAdapter.Listener {
+public class MainActivity extends AppCompatActivity implements
+        NotificationAdapter.Listener,
+        SwipeHelper.Listener {
 
     // TODO: ButterKnife
 
@@ -40,8 +45,9 @@ public class MainActivity extends AppCompatActivity implements NotificationAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: Should I have to do this?  If so where?
-        startService(new Intent(this, NotificationService.class));
+        // Every time the user opens the app, make sure the service is started
+        startService(new Intent(this, NotificationService.class)
+                .setAction(NotificationService.ACTION_REBIND));
 
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
@@ -51,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements NotificationAdapt
 
         mRecycler.setLayoutManager(mManager);
         mRecycler.setAdapter(mAdapter);
+
+        // Listen for swipes
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new SwipeHelper(this));
+        touchHelper.attachToRecyclerView(mRecycler);
 
         // Observe notifications
         mViewModel.getNotifications().observe(this, new Observer<List<NotificationDisplayInfo>>() {
@@ -94,12 +104,22 @@ public class MainActivity extends AppCompatActivity implements NotificationAdapt
     }
 
     @Override
+    public void onItemDismissed(int position) {
+        Log.d(TAG, "onItemDismissed: " + position);
+
+        NotificationInfo info = mAdapter.getItem(position).info;
+        mAdapter.notifyItemRemoved(position);
+        mViewModel.removeNotification(info);
+    }
+
+    @Override
     public void onNotificationClicked(NotificationInfo info) {
         boolean launched = NotificationActionCache.launchAction(this, info);
         if (launched) {
             showToast("Opening...");
 
             // TODO: Should we always delete after launch?
+
             mViewModel.removeNotification(info);
         } else {
             showSnackbar("Oops! There was a problem opening that.");

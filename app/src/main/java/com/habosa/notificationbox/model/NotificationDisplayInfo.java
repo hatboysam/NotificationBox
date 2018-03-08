@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -37,6 +38,14 @@ public class NotificationDisplayInfo {
             icon = pm.getApplicationIcon(appInfo);
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "getApplicationInfo", e);
+        }
+    }
+
+    public String getDisplayTitle() {
+        if (TextUtils.isEmpty(info.getTitle())) {
+            return appName;
+        } else {
+            return info.getTitle();
         }
     }
 

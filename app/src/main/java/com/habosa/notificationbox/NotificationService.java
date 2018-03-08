@@ -4,7 +4,9 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
@@ -12,6 +14,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompatExtras;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.habosa.notificationbox.data.AppDatabase;
@@ -24,6 +27,8 @@ import com.habosa.notificationbox.util.PreferenceUtils;
 public class NotificationService extends NotificationListenerService {
 
     private static final String TAG = "NotificationService";
+
+    public static final String ACTION_REBIND = "action_rebind";
 
     private static final int SUMMARY_NOTIF_ID = 101;
 
@@ -41,6 +46,18 @@ public class NotificationService extends NotificationListenerService {
 
         mNotificationDao = AppDatabase.getInstance(getApplicationContext()).notificationDao();
         mPrefs = new PreferenceUtils(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand: " + intent);
+        if (intent != null
+                && !TextUtils.isEmpty(intent.getAction())
+                && intent.getAction().equals(ACTION_REBIND)) {
+            tryReconnectService();
+        }
+
+        return START_STICKY;
     }
 
     @Override
@@ -78,8 +95,8 @@ public class NotificationService extends NotificationListenerService {
 
         // Show a notification
         showSummaryNotification();
+
         // TODO: Send a broadcast here to force the app to reload if it's open
-        // TODO: We should have a long-standing notification showing how many things we have stored
     }
 
     private void insert(final NotificationInfo info, final StatusBarNotification sbn) {
@@ -158,5 +175,30 @@ public class NotificationService extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification notification) {
         super.onNotificationRemoved(notification);
         Log.d(TAG, "onNotificationRemoved:" + notification.toString());
+    }
+
+    /**
+     * Try to reconnect the service.
+     * https://stackoverflow.com/questions/45124673/notification-listener-service-does-not-work-after-app-is-crashed
+     */
+    public void tryReconnectService() {
+        toggleNotificationListenerService();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ComponentName componentName = new ComponentName(
+                    getApplicationContext(), NotificationService.class);
+
+            NotificationListenerService.requestRebind(componentName);
+        }
+    }
+
+    /**
+     * Try deactivate/activate your component service
+     */
+    private void toggleNotificationListenerService() {
+        PackageManager pm = getPackageManager();
+        pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        pm.setComponentEnabledSetting(new ComponentName(this, NotificationService.class),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 }

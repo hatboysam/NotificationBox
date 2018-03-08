@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
@@ -64,7 +65,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         notifyDataSetChanged();
     }
 
+    public NotificationDisplayInfo getItem(int position) {
+        return mNotifications.get(position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final View mBehindView;
+        private final View mMainView;
 
         private ImageView mIconView;
         private TextView mTimeView;
@@ -73,6 +81,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
+
+            mBehindView = itemView.findViewById(R.id.item_notification_behind);
+            mMainView = itemView.findViewById(R.id.item_notification_main);
 
             mIconView = itemView.findViewById(R.id.notification_image_icon);
             mTimeView = itemView.findViewById(R.id.notification_text_time);
@@ -86,6 +97,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         public void bind(final NotificationDisplayInfo displayInfo) {
             // TODO: Turn into a custom view that binds Notification
+            setSwipeDx(0);
 
             long diff = System.currentTimeMillis() - displayInfo.info.getPostTime();
             long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
@@ -105,7 +117,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             mIconView.setImageDrawable(displayInfo.icon);
             mTimeView.setText(timeString);
-            mTitleView.setText(displayInfo.info.getTitle());
+
+            mTitleView.setText(displayInfo.getDisplayTitle());
             mBodyView.setText(displayInfo.info.getBody());
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +129,29 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     }
                 }
             });
+        }
+
+        public void setSwipeDx(float dX) {
+            float width = (float) itemView.getWidth();
+            float swipeFraction = Math.abs(dX) / width;
+
+            if (dX > 0) {
+                // Stretch the red "behind view" to the right
+                mBehindView.setVisibility(View.VISIBLE);
+                mBehindView.setLayoutParams(
+                        new RelativeLayout.LayoutParams((int) dX, mBehindView.getHeight()));
+            } else {
+                mBehindView.setVisibility(View.INVISIBLE);
+            }
+
+
+            // Move the main view to the right and lower the alpha
+            mMainView.setTranslationX(dX);
+            mMainView.setAlpha(1.0f - swipeFraction);
+        }
+
+        public void resetSwipe() {
+            mBehindView.setVisibility(View.INVISIBLE);
         }
     }
 
