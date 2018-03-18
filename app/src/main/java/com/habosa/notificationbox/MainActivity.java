@@ -2,12 +2,14 @@ package com.habosa.notificationbox;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -79,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         if (!hasNotificationPermissions()) {
-            // TODO: Softer UX
-            launchNotificationAccessSettings();
+            explanNotificationAccess();
+            return;
         }
 
         mViewModel.requestNotificationInfos();
@@ -132,6 +134,25 @@ public class MainActivity extends AppCompatActivity implements
         for (NotificationDisplayInfo ndi : displayInfos) {
             mAdapter.add(ndi);
         }
+    }
+
+    private void explanNotificationAccess() {
+        new AlertDialog.Builder(this)
+                .setTitle("Grant Notification Access")
+                .setMessage("NotificationBox needs access to your notifications to work.")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        launchNotificationAccessSettings();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
     }
 
     private boolean hasNotificationPermissions() {
