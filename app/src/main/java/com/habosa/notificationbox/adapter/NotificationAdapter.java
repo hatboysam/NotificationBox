@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.habosa.notificationbox.R;
@@ -71,7 +70,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final View mBehindView;
         private final View mMainView;
 
         private ImageView mIconView;
@@ -82,7 +80,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mBehindView = itemView.findViewById(R.id.item_notification_behind);
             mMainView = itemView.findViewById(R.id.item_notification_main);
 
             mIconView = itemView.findViewById(R.id.notification_image_icon);
@@ -135,23 +132,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             float width = (float) itemView.getWidth();
             float swipeFraction = Math.abs(dX) / width;
 
-            if (dX > 0) {
-                // Stretch the red "behind view" to the right
-                mBehindView.setVisibility(View.VISIBLE);
-                mBehindView.setLayoutParams(
-                        new RelativeLayout.LayoutParams((int) dX, mBehindView.getHeight()));
-            } else {
-                mBehindView.setVisibility(View.INVISIBLE);
-            }
-
-
             // Move the main view to the right and lower the alpha
             mMainView.setTranslationX(dX);
-            mMainView.setAlpha(1.0f - swipeFraction);
         }
 
         public void resetSwipe() {
-            mBehindView.setVisibility(View.INVISIBLE);
+            mMainView.setTranslationX(0);
         }
     }
 
