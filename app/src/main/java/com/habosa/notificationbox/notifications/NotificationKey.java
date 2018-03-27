@@ -1,6 +1,9 @@
 package com.habosa.notificationbox.notifications;
 
 import android.service.notification.StatusBarNotification;
+import android.text.TextUtils;
+
+import java.util.Locale;
 
 /**
  * Created by samstern on 3/3/18.
@@ -12,9 +15,9 @@ public class NotificationKey {
     private final String mTag;
 
     public NotificationKey(StatusBarNotification sbn) {
-        mKey = sbn.getKey();
+        mKey = TextUtils.isEmpty(sbn.getKey()) ? "KEY" : sbn.getKey();
         mId = sbn.getId();
-        mTag = sbn.getTag();
+        mTag = TextUtils.isEmpty(sbn.getTag()) ? "TAG" : sbn.getTag();
     }
 
     public NotificationKey(String keyString) {
@@ -30,6 +33,6 @@ public class NotificationKey {
 
     @Override
     public String toString() {
-        return String.format("%s:%d:%s", mKey, mId, mTag);
+        return String.format(Locale.getDefault(), "%s:%d:%s", mKey, mId, mTag);
     }
 }

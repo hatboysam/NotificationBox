@@ -7,7 +7,7 @@ import com.habosa.notificationbox.notifications.NotificationKey;
 public class CustomConverters {
 
     @TypeConverter
-    public static NotificationKey keyFrommString(String string) {
+    public static NotificationKey keyFromString(String string) {
         return new NotificationKey(string);
     }
 

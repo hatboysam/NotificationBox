@@ -20,6 +20,11 @@ public class NotificationActionCache {
     private static LruCache<String, PendingIntent> sCache = new LruCache<>(100);
 
     public static void put(NotificationInfo info, PendingIntent intent) {
+        if (intent == null || info.getKey() == null || info.getKey().toString() == null) {
+            Log.w(TAG, "Null key or value: " + info.getKey() + ", " + intent);
+            return;
+        }
+        
         sCache.put(info.getKey().toString(), intent);
     }
 
