@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.habosa.notificationbox.SettingsFragment;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +45,14 @@ public class PreferenceUtils {
 
     public boolean getAppSelected(String packageName) {
         return mPrefs.getBoolean(KEY_PREFIX_APP_SELECTED + packageName, false);
+    }
+
+    public boolean getNotificationEnabled() {
+        return mPrefs.getBoolean(SettingsFragment.KEY_SHOW_COUNT_NOTIFICATION, true);
+    }
+
+    public String getNotificationMode() {
+        return mPrefs.getString(SettingsFragment.KEY_COUNT_NOTIFICATION_MODE, "every_1");
     }
 
     private void addToSelected(String packageName) {

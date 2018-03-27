@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menu_select_apps:
                 startActivity(new Intent(this, AppSelectionActivity.class));
                 return true;
+            case R.id.menu_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

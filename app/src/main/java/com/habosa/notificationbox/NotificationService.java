@@ -118,6 +118,31 @@ public class NotificationService extends NotificationListenerService {
     }
 
     private void showSummaryNotification(int count) {
+        if (!mPrefs.getNotificationEnabled()) {
+            Log.w(TAG, "Notifications disabled.");
+            return;
+        }
+
+        int batching;
+        switch (mPrefs.getNotificationMode()) {
+            case "every_1":
+                batching = 1;
+                break;
+            case "every_5":
+                batching = 5;
+                break;
+            case "every_10":
+                batching = 10;
+                break;
+            default:
+                batching = 1;
+        }
+
+        if (count % batching != 0) {
+            Log.w(TAG, "Ignoring count " + count + " due to batching " + batching);
+            return;
+        }
+
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
 
         // Create channel

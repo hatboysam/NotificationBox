@@ -8,7 +8,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
             android:label="@string/activity_name_notifications">
@@ -18,10 +17,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        
         <activity
             android:name=".AppSelectionActivity"
             android:label="@string/activity_name_select_apps" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme.Settings" />
 
         <service
             android:name=".NotificationService"
@@ -32,7 +35,6 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>
