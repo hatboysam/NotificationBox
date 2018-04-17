@@ -9,6 +9,8 @@ import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by samstern on 2/27/18.
  */
@@ -46,6 +48,23 @@ public class NotificationDisplayInfo {
             return appName;
         } else {
             return info.getTitle();
+        }
+    }
+
+    public String getTimeAgo() {
+        long diff = System.currentTimeMillis() - info.getPostTime();
+        long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
+        long hoursAgo = TimeUnit.MILLISECONDS.toHours(diff);
+        long daysAgo = TimeUnit.MILLISECONDS.toDays(diff);
+
+        if (minutesAgo < 1) {
+            return "now";
+        } else if (minutesAgo < 60) {
+            return "" + minutesAgo + "m";
+        } else if (hoursAgo < 24) {
+            return "" + hoursAgo + "h";
+        } else {
+            return "" + daysAgo + "d";
         }
     }
 

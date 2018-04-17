@@ -1,6 +1,5 @@
 package com.habosa.notificationbox.adapter;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,9 @@ import com.habosa.notificationbox.model.NotificationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Created by samstern on 1/15/18.
+ * Adapter to display NotificationDisplayInfo.
  */
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
@@ -68,7 +66,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return mNotifications.get(position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements SwipeHelper.Swipeable {
 
         private final View mMainView;
 
@@ -88,32 +86,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             mBodyView = itemView.findViewById(R.id.notification_text_body);
         }
 
-        private Context getContext() {
-            return itemView.getContext();
-        }
-
         public void bind(final NotificationDisplayInfo displayInfo) {
-            // TODO: Turn into a custom view that binds Notification
             setSwipeDx(0);
 
-            long diff = System.currentTimeMillis() - displayInfo.info.getPostTime();
-            long minutesAgo = TimeUnit.MILLISECONDS.toMinutes(diff);
-            long hoursAgo = TimeUnit.MILLISECONDS.toHours(diff);
-            long daysAgo = TimeUnit.MILLISECONDS.toDays(diff);
-
-            String timeString;
-            if (minutesAgo < 1) {
-                timeString = "now";
-            } else if (minutesAgo < 60) {
-                timeString = "" + minutesAgo + "m";
-            } else if (hoursAgo < 24) {
-                timeString = "" + hoursAgo + "h";
-            } else {
-                timeString = "" + daysAgo + "d";
-            }
-
             mIconView.setImageDrawable(displayInfo.icon);
-            mTimeView.setText(timeString);
+            mTimeView.setText(displayInfo.getTimeAgo());
 
             mTitleView.setText(displayInfo.getDisplayTitle());
             mBodyView.setText(displayInfo.info.getBody());
@@ -128,14 +105,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             });
         }
 
+        @Override
         public void setSwipeDx(float dX) {
-            float width = (float) itemView.getWidth();
-            float swipeFraction = Math.abs(dX) / width;
-
-            // Move the main view to the right and lower the alpha
+            // Move the main view to the right
             mMainView.setTranslationX(dX);
         }
 
+        @Override
         public void resetSwipe() {
             mMainView.setTranslationX(0);
         }

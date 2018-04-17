@@ -36,7 +36,7 @@ public class AppSelectionActivityViewModel extends AndroidViewModel {
     public void startLoadApps() {
         mAppsLiveData.setValue(Resource.<List<AppDisplayInfo>>forLoading());
 
-        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
             @Override
             public void run() {
                 List<ApplicationInfo> infos = mPackageManager.getInstalledApplications(0);

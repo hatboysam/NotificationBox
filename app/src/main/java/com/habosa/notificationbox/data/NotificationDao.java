@@ -24,4 +24,7 @@ public interface NotificationDao {
 
     @Delete
     void delete(NotificationInfo info);
+
+    @Query("DELETE FROM NotificationInfo")
+    void deleteAll();
 }

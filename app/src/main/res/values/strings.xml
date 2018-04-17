@@ -14,6 +14,12 @@
         <item quantity="other">You have %d notifications!</item>
     </plurals>
     <string name="notifications_summary_body">Open NotificationBox to see them.</string>
+    <string name="dismiss_all">Dismiss All</string>
+
+    <string name="all_done_1">Woohoo! No more notifications.</string>
+    <string name="all_done_2">Nice! Nothing to see here.</string>
+    <string name="all_done_3">Hasta la vista, notifications!</string>
+    <string name="all_done_4">**tumbleweed rolls by**</string>
 
     <string-array name="count_notification_mode_entries">
         <item>Every notification</item>

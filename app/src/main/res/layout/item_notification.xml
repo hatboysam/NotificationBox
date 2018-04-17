@@ -12,14 +12,15 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_notification_main"
         android:layout_alignTop="@+id/item_notification_main"
-        android:background="#4CAF50">
+        android:background="@color/bg_item_notification_done">
 
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="32dp"
-            app:srcCompat='@drawable/ic_check_white_24px' />
+            app:srcCompat="@drawable/ic_check_white_24px"
+            tools:ignore="RtlHardcoded" />
 
     </FrameLayout>
 
@@ -28,8 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foreground="?attr/selectableItemBackground"
-        android:background="#FFFFFF"
-        tools:translationX="100dp">
+        android:background="@color/bg_item_notification"
+        tools:translationX="20dp">
 
         <ImageView
             android:id="@+id/notification_image_icon"
@@ -69,19 +70,28 @@
 
         <TextView
             android:id="@+id/notification_text_body"
+            style="@style/AppTheme.NotificationBody"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="4dp"
-            android:paddingBottom="16dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="@color/secondary_text"
-            android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@+id/notification_text_time"
             app:layout_constraintStart_toStartOf="@+id/notification_text_title"
             app:layout_constraintTop_toBottomOf="@+id/notification_text_title"
-            tools:text="Content body, much longer and a whole thing and it just can be so long you don't know what to do." />
+            tools:text="Content body, much longer and a whole thing and it just can be so long you don't know what to do."
+            tools:visibility="invisible"/>
+
+        <com.habosa.notificationbox.ui.MultiEllipsisTextView
+            android:id="@+id/notification_text_body_group"
+            style="@style/AppTheme.NotificationBody"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/notification_text_time"
+            app:layout_constraintStart_toStartOf="@+id/notification_text_title"
+            app:layout_constraintTop_toBottomOf="@+id/notification_text_title"
+            tools:text="A first thing\nSome other thing\nThis is the third thing\n(3 more)"
+            tools:visibility="visible"/>
 
     </android.support.constraint.ConstraintLayout>
 

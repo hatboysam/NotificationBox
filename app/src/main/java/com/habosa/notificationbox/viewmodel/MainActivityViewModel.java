@@ -41,9 +41,20 @@ public class MainActivityViewModel extends AndroidViewModel {
         return mNotificationInfos;
     }
 
+    public void dismissAll() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
+            @Override
+            public void run() {
+                mNotificationDao.deleteAll();
+            }
+        });
+
+        requestNotificationInfos();
+    }
+
     public void removeNotification(final NotificationInfo info) {
         // TODO: Move to repository
-        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
             @Override
             public void run() {
                 mNotificationDao.delete(info);
@@ -55,11 +66,11 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void requestNotificationInfos() {
         // TODO: Move to repository.
-        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
             @Override
             public void run() {
                 List<NotificationInfo> infos = mNotificationDao.getAll();
-                ArrayList<NotificationDisplayInfo> displayInfos = new ArrayList<>();
+                ArrayList<NotificationDisplayInfo> displayInfos = new ArrayList<>(infos.size());
                 for (NotificationInfo ni : infos) {
                     NotificationDisplayInfo ndi = new NotificationDisplayInfo(ni);
                     ndi.load(mPackageManager, mResources);

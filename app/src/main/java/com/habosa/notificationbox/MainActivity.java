@@ -17,6 +17,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.habosa.notificationbox.adapter.NotificationAdapter;
@@ -27,6 +30,7 @@ import com.habosa.notificationbox.notifications.NotificationActionCache;
 import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements
         NotificationAdapter.Listener,
@@ -36,7 +40,24 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
 
+    private static final int[] ALL_DONE_EMOJIS = new int[]{
+            R.drawable.man_dancing_u1f57a,
+            R.drawable.man_lifting_weights_u1f3cb,
+            R.drawable.woman_dancing_u1f483,
+            R.drawable.woman_tipping_hand_u1f481,
+    };
+
+    private static final int[] ALL_DONE_MESSAGES = new int[] {
+        R.string.all_done_1,
+        R.string.all_done_2,
+        R.string.all_done_3,
+        R.string.all_done_4,
+    };
+
+    private ImageView mAllDoneImage;
+    private TextView mAllDoneText;
     private RecyclerView mRecycler;
+
     private NotificationAdapter mAdapter;
     private LinearLayoutManager mManager;
 
@@ -53,7 +74,10 @@ public class MainActivity extends AppCompatActivity implements
 
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        mAllDoneImage = findViewById(R.id.all_done_emoji);
+        mAllDoneText = findViewById(R.id.all_done_text);
         mRecycler = findViewById(R.id.notifications_recycler);
+
         mAdapter = new NotificationAdapter(this);
         mManager = new LinearLayoutManager(this);
 
@@ -103,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
+            case R.id.menu_dismiss_all:
+                onDismissAllClicked();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -137,6 +164,23 @@ public class MainActivity extends AppCompatActivity implements
         for (NotificationDisplayInfo ndi : displayInfos) {
             mAdapter.add(ndi);
         }
+
+        showAllDoneMessage(displayInfos.isEmpty());
+    }
+
+    private void onDismissAllClicked() {
+        new AlertDialog.Builder(this)
+                .setTitle("Dismiss All")
+                .setMessage("Are you sure you want to dismiss all notifications?")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mViewModel.dismissAll();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+                .show();
     }
 
     private void explanNotificationAccess() {
@@ -166,6 +210,22 @@ public class MainActivity extends AppCompatActivity implements
 
     private void launchNotificationAccessSettings() {
         startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+    }
+
+    private void showAllDoneMessage(boolean show) {
+        int visibility = show ? View.VISIBLE : View.GONE;
+        mAllDoneText.setVisibility(visibility);
+        mAllDoneImage.setVisibility(visibility);
+
+        if (show) {
+            Random random = new Random();
+
+            int emoji = ALL_DONE_EMOJIS[random.nextInt(ALL_DONE_EMOJIS.length)];
+            int message = ALL_DONE_MESSAGES[random.nextInt(ALL_DONE_MESSAGES.length)];
+
+            mAllDoneImage.setImageResource(emoji);
+            mAllDoneText.setText(message);
+        }
     }
 
     private void showToast(String message) {

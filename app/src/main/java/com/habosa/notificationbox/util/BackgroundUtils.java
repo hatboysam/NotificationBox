@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BackgroundUtils {
 
-    public static final ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(2, 4,
+    public static final ThreadPoolExecutor SERIAL = new ThreadPoolExecutor(1, 1,
             60, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>());
 
 }

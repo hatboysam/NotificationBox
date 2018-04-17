@@ -95,7 +95,7 @@ public class NotificationService extends NotificationListenerService {
 
         // Show a notification
         // TODO: same deal
-        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
             @Override
             public void run() {
                 int count = mNotificationDao.count();
@@ -108,7 +108,7 @@ public class NotificationService extends NotificationListenerService {
 
     private void insert(final NotificationInfo info, final StatusBarNotification sbn) {
         // TODO: I need to do more sane thread management.
-        BackgroundUtils.EXECUTOR.execute(new Runnable() {
+        BackgroundUtils.SERIAL.execute(new Runnable() {
             @Override
             public void run() {
                 mNotificationDao.insert(info);

@@ -9,6 +9,17 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  */
 public class SwipeHelper extends ItemTouchHelper.Callback {
 
+    /**
+     * Horizontally swipeable target.
+     */
+    public interface Swipeable {
+
+        void resetSwipe();
+
+        void setSwipeDx(float dX);
+
+    }
+
     public interface Listener {
 
         void onItemDismissed(int position);
@@ -33,18 +44,14 @@ public class SwipeHelper extends ItemTouchHelper.Callback {
     public boolean onMove(RecyclerView recyclerView,
                           RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
-
-        // TODO: Should I actually return true?
-        return true;
+        return false;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         if (mListener != null) {
             mListener.onItemDismissed(viewHolder.getAdapterPosition());
-
-            // TODO: Here and elsewhere, enforce the cast
-            ((NotificationAdapter.ViewHolder) viewHolder).resetSwipe();
+            ((Swipeable) viewHolder).resetSwipe();
         }
     }
 
@@ -55,8 +62,7 @@ public class SwipeHelper extends ItemTouchHelper.Callback {
                             int actionState, boolean isCurrentlyActive) {
 
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            NotificationAdapter.ViewHolder nvh = (NotificationAdapter.ViewHolder) viewHolder;
-            nvh.setSwipeDx(dX);
+            ((Swipeable) viewHolder).setSwipeDx(dX);
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY,
                     actionState, isCurrentlyActive);
