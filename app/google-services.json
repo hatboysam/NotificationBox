@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "615073556016",
+    "firebase_url": "https://notificationbox-ca818.firebaseio.com",
+    "project_id": "notificationbox-ca818",
+    "storage_bucket": "notificationbox-ca818.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:615073556016:android:f106bf6c969ae90c",
+        "android_client_info": {
+          "package_name": "com.habosa.notificationbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "615073556016-t7ung0imqre3c8veegcb3mr2vk9tpce3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5efPI-PDAkF6oftJyvtdJ72dSBV6bZMs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
