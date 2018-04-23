@@ -10,24 +10,32 @@ import java.util.Locale;
  */
 public class NotificationKey {
 
+    private static final String SEP = ":";
+
     private final String mKey;
-    private final int mId;
+    private final long mId;
     private final String mTag;
 
     public NotificationKey(StatusBarNotification sbn) {
-        mKey = TextUtils.isEmpty(sbn.getKey()) ? "KEY" : sbn.getKey();
+        String key = TextUtils.isEmpty(sbn.getKey()) ? "KEY" : sbn.getKey();
+        key = key.replace(SEP, "~");
+
+        String tag = TextUtils.isEmpty(sbn.getTag()) ? "TAG" : sbn.getTag();
+        tag = tag.replace(SEP, "~");
+
+        mKey = key;
         mId = sbn.getId();
-        mTag = TextUtils.isEmpty(sbn.getTag()) ? "TAG" : sbn.getTag();
+        mTag = tag;
     }
 
     public NotificationKey(String keyString) {
         String[] parts = keyString.split(":");
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("String has !=3 parts: " + keyString);
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("String has < 3 parts: " + keyString);
         }
 
         mKey = parts[0];
-        mId = Integer.parseInt(parts[1]);
+        mId = Long.parseLong(parts[1]);
         mTag = parts[2];
     }
 

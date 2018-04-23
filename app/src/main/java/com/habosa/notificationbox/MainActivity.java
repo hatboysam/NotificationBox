@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.menu_dismiss_all:
+                // TODO: hide this option when there are no notifs
                 onDismissAllClicked();
                 return true;
         }
