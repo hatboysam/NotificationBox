@@ -159,6 +159,7 @@ public class NotificationService extends NotificationListenerService {
         }
 
         Intent homeIntent = new Intent(this, MainActivity.class);
+        homeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent contentIntent = PendingIntent.getActivity(
                 this, 0, homeIntent, 0);
 

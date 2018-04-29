@@ -1,20 +1,17 @@
 package com.habosa.notificationbox.ui;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.AttributeSet;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * TextView that ellipsizes each line, if necessary.
  */
-public class MultiEllipsisTextView extends android.support.v7.widget.AppCompatTextView {
-
-    private static final Pattern LINE_PATTERN = Pattern.compile(".+($|\\n)");
+public class MultiEllipsisTextView extends AppCompatTextView {
 
     public MultiEllipsisTextView(Context context) {
         super(context);
@@ -28,22 +25,23 @@ public class MultiEllipsisTextView extends android.support.v7.widget.AppCompatTe
         super(context, attrs, defStyleAttr);
     }
 
+
     public void setText(List<String> lines) {
         // TODO: Add a feature to limit the max number of lines
         SpannableStringBuilder sb = new SpannableStringBuilder();
         for (int i = 0; i < lines.size(); i++) {
+            int beforeSize = sb.length();
             sb.append(lines.get(i));
+            int afterSize = sb.length();
+
+            // Add a newline to all but the last line
             if (i < lines.size() - 1) {
                 sb.append('\n');
             }
-        }
 
-        // TODO: Rather than using a regex matcher, I can almost definitely do this inline
-        //       while building the string
-        Matcher matcher = LINE_PATTERN.matcher(sb);
-        while(matcher.find()) {
+            // Ellipsize the span
             sb.setSpan(new EllipsizeLineSpan(),
-                    matcher.start(), matcher.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    beforeSize, afterSize - 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
         setText(sb.toString());
