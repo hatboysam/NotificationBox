@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,9 +23,12 @@ import android.widget.Toast;
 
 import com.habosa.notificationbox.adapter.NotificationAdapter;
 import com.habosa.notificationbox.adapter.SwipeHelper;
+import com.habosa.notificationbox.analyics.Analytics;
 import com.habosa.notificationbox.model.NotificationDisplayInfo;
 import com.habosa.notificationbox.model.NotificationInfo;
 import com.habosa.notificationbox.notifications.NotificationActionCache;
+import com.habosa.notificationbox.util.NotificationAccessUtils;
+import com.habosa.notificationbox.util.PreferenceUtils;
 import com.habosa.notificationbox.viewmodel.MainActivityViewModel;
 
 import java.util.List;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     private NotificationAdapter mAdapter;
     private LinearLayoutManager mManager;
 
+    private PreferenceUtils mPrefs;
     private MainActivityViewModel mViewModel;
 
     @Override
@@ -68,9 +71,15 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mPrefs = new PreferenceUtils(this);
+
         // Every time the user opens the app, make sure the service is started
         startService(new Intent(this, NotificationService.class)
                 .setAction(NotificationService.ACTION_REBIND));
+
+        if (!mPrefs.hasShownIntro() || !NotificationAccessUtils.hasNotificationPermissions(this)) {
+            startActivity(new Intent(this, IntroActivity.class));
+        }
 
         mViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
@@ -104,11 +113,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if (!hasNotificationPermissions()) {
-            explanNotificationAccess();
-            return;
-        }
-
         mViewModel.requestNotificationInfos();
     }
 
@@ -143,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements
         NotificationInfo info = mAdapter.getItem(position).info;
         mAdapter.notifyItemRemoved(position);
         mViewModel.removeNotification(info);
+
+        Analytics.logNotificationDismiss(this, info);
     }
 
     @Override
@@ -150,13 +156,12 @@ public class MainActivity extends AppCompatActivity implements
         boolean launched = NotificationActionCache.launchAction(this, info);
         if (launched) {
             showToast("Opening...");
-
-            // TODO: Should we always delete after launch?
-
             mViewModel.removeNotification(info);
         } else {
             showSnackbar("Oops! There was a problem opening that.");
         }
+
+        Analytics.logNotificationClicked(this, info);
     }
 
     private void onNotifications(@NonNull List<NotificationDisplayInfo> displayInfos) {
@@ -177,40 +182,12 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mViewModel.dismissAll();
+                        Analytics.logAllDismissed(MainActivity.this);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show();
-    }
-
-    private void explanNotificationAccess() {
-        new AlertDialog.Builder(this)
-                .setTitle("Grant Notification Access")
-                .setMessage("NotificationBox needs access to your notifications to work.")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        launchNotificationAccessSettings();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .show();
-    }
-
-    private boolean hasNotificationPermissions() {
-        return NotificationManagerCompat
-                .getEnabledListenerPackages(this)
-                .contains(getPackageName());
-    }
-
-    private void launchNotificationAccessSettings() {
-        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
     }
 
     private void showAllDoneMessage(boolean show) {

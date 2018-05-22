@@ -17,6 +17,7 @@ import java.util.Set;
 public class PreferenceUtils {
 
     private static final String TAG = "PreferenceUtils";
+    private static final String KEY_HAS_SHOWN_INTRO = "key_has_shown_intro";
     private static final String KEY_ALL_SELECTED = "key_all_selected";
     private static final String KEY_PREFIX_APP_SELECTED = "key_app_selected_";
 
@@ -41,6 +42,14 @@ public class PreferenceUtils {
         } else {
             removeFromSelected(packageName);
         }
+    }
+
+    public boolean hasShownIntro() {
+        return mPrefs.getBoolean(KEY_HAS_SHOWN_INTRO, false);
+    }
+
+    public void setHasShownIntro(boolean shown) {
+        mPrefs.edit().putBoolean(KEY_HAS_SHOWN_INTRO, shown).apply();
     }
 
     public boolean getAppSelected(String packageName) {
