@@ -20,6 +20,7 @@
     <string name="all_done_2">Nice! Nothing to see here.</string>
     <string name="all_done_3">Hasta la vista, notifications!</string>
     <string name="all_done_4">**tumbleweed rolls by**</string>
+    <string name="licenses">Licenses</string>
 
     <string-array name="count_notification_mode_entries">
         <item>Every notification</item>

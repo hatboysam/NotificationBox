@@ -17,15 +17,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".IntroActivity"
             android:theme="@style/Theme.Intro" />
-
         <activity
             android:name=".AppSelectionActivity"
             android:label="@string/activity_name_select_apps" />
-
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/AppTheme.Settings" />
@@ -39,6 +36,8 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <activity android:name=".LicenseActivity"></activity>
     </application>
 
 </manifest>

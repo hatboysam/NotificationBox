@@ -135,6 +135,9 @@ public class MainActivity extends AppCompatActivity implements
                 // TODO: hide this option when there are no notifs
                 onDismissAllClicked();
                 return true;
+            case R.id.licenses:
+                startActivity(new Intent(this, LicenseActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
